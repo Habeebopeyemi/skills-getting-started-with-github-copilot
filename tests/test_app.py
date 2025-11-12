@@ -31,3 +31,21 @@ def test_signup_for_activity_not_found():
     response = client.post("/activities/Nonexistent/signup?email=nouser@mergington.edu")
     assert response.status_code == 404
     assert response.json()["detail"] == "Activity not found"
+
+
+def test_unregister_for_activity_success():
+    # Register, then unregister
+    client.post("/activities/Science Club/signup?email=unreguser@mergington.edu")
+    response = client.post("/activities/Science Club/unregister?email=unreguser@mergington.edu")
+    assert response.status_code == 200
+    assert "Removed unreguser@mergington.edu from Science Club" in response.json()["message"]
+
+def test_unregister_for_activity_not_found():
+    response = client.post("/activities/Nonexistent/unregister?email=nouser@mergington.edu")
+    assert response.status_code == 404
+    assert response.json()["detail"] == "Activity not found"
+
+def test_unregister_for_activity_not_registered():
+    response = client.post("/activities/Art Club/unregister?email=notregistered@mergington.edu")
+    assert response.status_code == 400
+    assert response.json()["detail"] == "Student is not registered for this activity"
